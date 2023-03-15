@@ -1,22 +1,21 @@
-const SERVER_URL = 'http://localhost:3000/';
+const SERVER_URL = "http://localhost:3000";
 
-fetch('http://localhost:3000/users', { method: 'GET'})
-    .then((res) => res.json())
-    .then((data) => console.log(data))
+// fetch('http://localhost:3000/users', { method: 'GET'})
+//     .then((res) => res.json())
+//     .then((data) => console.log(data))
 
 const jsonRequest = (url, options = {}) => {
-  
   return fetch(SERVER_URL + url, {
-    headers: { 'content-type': 'application/json'},
+    headers: { "content-type": "application/json" },
     ...options,
   }).then((response) => response.json());
 };
 
 export const fetchUsers = () => {
   const options = {
-    method: 'GET',
+    method: "GET",
   };
-  const req = jsonRequest('/users', options);
+  const req = jsonRequest("/users", options);
 
   return req;
 };
@@ -24,31 +23,31 @@ export const fetchUsers = () => {
 export const saveUser = (user) => {
   const options = {
     body: JSON.stringify(user),
-    method: 'PUT',
+    method: "PUT",
   };
 
   const req = jsonRequest(`/users/${user.id}`, options);
 
-  return req
-}
+  return req;
+};
 
 export const deleteUser = (user) => {
   const options = {
-    method: 'DELETE',
+    method: "DELETE",
   };
 
   const req = jsonRequest(`/users/${user.id}`, options);
 
-  return req
-}
+  return req;
+};
 
 export const createUser = (user) => {
   const options = {
     body: JSON.stringify(user),
-    method: 'POST',
+    method: "POST",
   };
 
   const req = jsonRequest(`/users`, options);
 
-  return req
-}
+  return req;
+};
