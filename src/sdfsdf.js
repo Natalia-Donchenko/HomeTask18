@@ -1,183 +1,469 @@
-<div className='wrapper'>
-          <div className='form'>
-            <h1 className='form__title'>User Editor</h1>
-            <form 
-              className='form__editor' 
-              // editingUser={editingUser} 
-              onSubmit={handleUserEdit}>
-        
-              <label className='form__editor-label'>Firts Name*</label>
-              <input 
-                className='form__editor_input' 
-                value={editingUser.firstName} 
-                onChange={(e) => handleFirstNameChange(e.target.value)}
-                id="firstName" 
-                type="text" 
-                name="first_name"
-                
-              />
-              
-              <label className='form__editor-label'>Last Name*</label>
-              <input 
-                className='form__editor_input' 
-                value={editingUser.lastName} 
-                onChange={(e) => handleLastNameChange(e.target.value)}
-                id="lastName" 
-                type="text" 
-                name="last_name"
-              /> 
-              
-              <label className='form__editor-label'>Email</label>
-              <input 
-                className='form__editor_input' 
-                value={editingUser.email} 
-                onChange={(e) => handleEmailChange(e.target.value)}
-                id="email" 
-                type="email" 
-                name="email"
-              />
+import React, { useEffect } from "react";
+// import { data } from './users-data';
+import "./styles.css";
+import { useState } from "react";
 
-              <label className='form__editor-label'>Password</label>
-              <input
-                className='form__editor_input'
-                value={editingUser.password}
-                onChange={(e) => handlebPasswordChange(e.target.value)}
-                type='password'
-                name='password'
-              />
-          
-              <label className='form__editor-label'>Age</label>
-              <input
-                className='form__editor_input'
-                value={editingUser.age}
-                onChange={(e) => handleAgeChange(e.target.value)}
-                type="number"
-                name="age"
-                id='age'
-              />
+import { fetchUsers, saveUser } from "./utils/api";
 
-              <div className='form__birthDate'>
-                <label className='form__editor-label'>Birth Date</label>
+function App() {
+  // const userData = deepClone(data.users);
+  const [users, setUsers] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  // const [valid, setValid] = useState(false);
+
+  // console.log("users", users);
+  useEffect(() => {
+    fetchUsers()
+      .then(setUsers)
+      .then(() => setLoading(false));
+  }, []);
+
+  const handleUserEdit = (value) => {
+    const user = users.find((el) => el.id === +value);
+    setEditingUser(user);
+  };
+
+
+  const handleUserSubmit = () => {
+    setLoading(true);
+
+    saveUser(editingUser)
+      .then(fetchUsers)
+      .then(setUsers)
+      .then(() => {
+        setEditingUser(null);
+        setLoading(false);
+      });
+
+    // const editingUserIndex = users.findIndex(user => user.id === editingUser.id);
+    // const updatedUsers = [...users];
+
+    // updatedUsers[editingUserIndex]=editingUser;
+    // setUsers(updatedUsers);
+    // setEditingUser(null)
+  };
+
+  const handleFirstNameChange = (firstName) => {
+    // if (firstName.length < 1) {
+    //   setValid(true)
+    // } else {
+    //   setValid(false)
+    // }
+    setEditingUser({ ...editingUser, firstName });
+  };
+
+  const handleLastNameChange = (lastName) => {
+    // if (lastName.length < 1) {
+    //   setValid(true)
+    // } else {
+    //   setValid(false)
+    // }
+    setEditingUser({ ...editingUser, lastName });
+  };
+
+  const handleEmailChange = (email) => {
+    // if (!email.includes('@') || email.startsWith('@') || email.endsWith('@')) {
+    //   setValid(true)
+    // } else {
+    //   setValid(false)
+    // }
+    setEditingUser({ ...editingUser, email });
+  };
+
+  const handlebPasswordChange = (password) => {
+    // if (!password) {
+    //   setValid(true)
+    // } else {
+    //   setValid(false)
+    // }
+    setEditingUser({ ...editingUser, password });
+  };
+
+  // const handleAgeChange = (age) => {
+  //   setEditingUser({ ...editingUser, age });
+  // };
+
+  const handlebirthDateChange = (birthDate) => {
+    setEditingUser({ ...editingUser, birthDate });
+  };
+  
+  const handleUpdateAge = () => {
+    const userBithday = Date.parse(editingUser.birthDate);
+    const today = Date.now();
+    editingUser.age = Math.floor((today - userBithday) / 31536000000);
+  };
+
+  const handleGenderChange = (gender) => {
+    setEditingUser({ ...editingUser, gender });
+  };
+
+  const handlePhoneChange = (phone) => {
+    setEditingUser({ ...editingUser, phone });
+  };
+
+  const handlebloodGroupChange = (bloodGroup) => {
+    setEditingUser({ ...editingUser, bloodGroup });
+  };
+
+  const handleHairColorChange = (color) => {
+    const updatedUser = {
+      ...editingUser,
+      hair: {
+        ...editingUser.hair,
+        color
+      },
+    }
+   
+    setEditingUser(updatedUser)
+  };
+
+  const handleTypeColorChange = (type) => {
+    const updatedUser = {
+      ...editingUser,
+      hair: {
+        ...editingUser.hair,
+        type
+      },
+    }
+   
+    setEditingUser(updatedUser)
+  };
+
+  const getColorOfHair = () => {
+
+    return users.reduce((acc, item) => {
+      if (acc.includes(item.hair.color)) {
+        return acc
+      } else {
+        return [...acc, item.hair.color]
+      }
+    }, [])
+      .map((item, key) => {
+        return <option key={key} value={item} />
+      })
+  }
+
+  const getTypeOfHair = () => {
+
+    return users.reduce((acc, item) => {
+      if (acc.includes(item.hair.type)) {
+        return acc
+      } else {
+        return [...acc, item.hair.type]
+      }
+    }, [])
+      .map((item, key) => {
+        return <option key={key} value={item} />
+      })
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="container">
+      {editingUser && (
+        <div className="wrapper">
+          <div className="form">
+            <h1 className="form-title">User Editor</h1>
+            <form className="row g-3" onSubmit={handleUserEdit}>
+              <div className="col-md-6">
+                <label className='form-label' htmlFor="firstName">
+                {/* <label className={valid ? 'red' : 'form-label'}  htmlFor="firstName"> */}
+                  Firts Name*
+                </label>
                 <input
-                  className='form__editor_input'
+                  id="firstName"
+                  type="text"
+                  name="firstName"
+                  className="form-control"
+                  value={editingUser.firstName}
+                  onChange={(e) => handleFirstNameChange(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="col-md-6">
+                <label className='form-label' htmlFor="lastName">
+                {/* <label className={valid ? 'red' : 'form-label'} htmlFor="lastName"> */}
+                  Last Name*
+                </label>
+                <input
+                  id="lastName"
+                  type="text"
+                  name="lastName"
+                  className="form-control"
+                  value={editingUser.lastName}
+                  onChange={(e) => handleLastNameChange(e.target.value)}
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label" htmlFor="email">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  className="form-control"
+                  value={editingUser.email}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label" htmlFor="phone">
+                  Phone Number
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  name="phone"
+                  className="form-control"
+                  value={editingUser.phone}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                />
+              </div>
+              <div className="col-4">
+                <label className="form-label" htmlFor="password">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  className="form-control"
+                  value={editingUser.password}
+                  onChange={(e) => handlebPasswordChange(e.target.value)}
+                />
+              </div>
+              <div className="col-md-4">
+                <label className="form-label" htmlFor="birthDate">
+                  Birth Date
+                </label>
+                <input
+                  id="birthDate"
+                  type="date"
+                  name="birthDate"
+                  className="form-control"
                   value={editingUser.birthDate}
                   onChange={(e) => handlebirthDateChange(e.target.value)}
-                  type="date"
-                  name="age"
                 />
-                <label className='form__editor-label'>Update age?</label>
+              </div>
+              {/* <div className="col-md-2">
+                <label className="form-label" htmlFor="age">
+                  Age
+                </label>
                 <input
-                  className='form__editor_input'
+                  id="age"
+                  type="number"
+                  name="age"
+                  className="form-control"
+                  value={editingUser.age}
+                  onChange={(e) => handleAgeChange(e.target.value)}
+                />
+              </div> */}
+              <div className="col-md-3 form-check-reverse">
+                <label className="form-label" htmlFor="updateAge">
+                  Update age?
+                </label>
+                <input
+                  id="updateAge"
                   type="checkbox"
+                  className="form-check-input"
                   onChange={(e) => handleUpdateAge(e.target.value)}
                 />
               </div>
-              
-              <div>
-                <label className='form__editor-label'>Gender</label>
-                <div className='form__editor_gender'>
-                  <label>
-                    <input 
-                      className='form-check-input'
+
+
+
+              <div className="col-md-12 hstack gap-3">
+                <span className="form-label" htmlFor="gender">
+                  Gender
+                </span>
+                <div className="form-check form-check-inline">
+                  <label className="form-label">
+                    <input
                       type="radio"
                       name="gender"
+                      className="form-check-input"
                       value="male"
                       onChange={(e) => handleGenderChange(e.target.value)}
-                      checked={editingUser.gender === 'male'}
+                      checked={editingUser.gender === "male"}
                     />
                     male
                   </label>
-                  <label>
-                    <input 
-                      className='form-check-input'
+                </div>
+                <div className="form-check form-check-inline">
+                  <label className="form-label">
+                    <input
                       type="radio"
                       name="gender"
+                      className="form-check-input"
                       value="female"
                       onChange={(e) => handleGenderChange(e.target.value)}
-                      checked={editingUser.gender === 'female'}
+                      checked={editingUser.gender === "female"}
                     />
                     female
                   </label>
-                  <label>
-                    <input 
-                      className='form-check-input'
+                </div>
+                <div className="form-check form-check-inline">
+                  <label className="form-label">
+                    <input
                       type="radio"
                       name="gender"
+                      className="form-check-input"
                       value="unset"
                       onChange={(e) => handleGenderChange(e.target.value)}
-                      checked={editingUser.gender === 'unset'}
+                      checked={editingUser.gender === "unset"}
                     />
                     prefer not to respond (unset)
                   </label>
                 </div>
               </div>
 
-              <div className='form__bloodGroup'>
-                <label className='form__editor-label'>Blood Group</label>
-                <div>
-                  <select 
-                    className='form__editor_input' 
-                    name='blood_group'
-                    value={editingUser.bloodGroup}
-                    onChange={(e) => handlebloodGroupChange(e.target.value)}>
-                      <option value="">{editingUser.bloodGroup}</option>
-                      <option value="A+">A RhD positive (A+)</option>
-                      <option value="A-">A RhD negative (A-)</option>
-                      <option value="B+">B RhD positive (B+)</option>
-                      <option value="B-">B RhD negative (B-)</option>
-                      <option value="0+">O RhD positive (O+)</option>
-                      <option value="0-">O RhD negative (O-)</option>
-                      <option value="AB+">AB RhD positive (AB+)</option>
-                      <option value="AB-">AB RhD negative (AB-)</option>
-                  </select>
-                </div>
+              <div className="col-md-6">
+                <label className="form-label" htmlFor="colorOfHair">
+                  Color of Hair
+                </label>
+                <input 
+                  list="colorOfHair" 
+                  className="form-control" 
+                  name='color' 
+                  id="color"
+                  value={editingUser?.hair?.color || ''}
+                  onChange={(e) => handleHairColorChange(e.target.value)}
+                />
+                <datalist id="colorOfHair"> 
+                  {getColorOfHair()}
+                </datalist>
               </div>
 
-              <label className='form__editor-label'>Phone Number</label>
-              <input
-                
-                name='phone'
-                type='tel'
-                value={editingUser.phone}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                required
-              />
+              <div className="col-md-6">
+                <label className="form-label" htmlFor="colorOfHair">
+                  Type of Hair
+                </label>
+                <input 
+                  list="typeOfHair" 
+                  className="form-control" 
+                  name='type' 
+                  id="type"
+                  value={editingUser?.hair?.type || ''}
+                  onChange={(e) => handleTypeColorChange(e.target.value)}
+                />
+                <datalist id="typeOfHair"> 
+                  {getTypeOfHair()}
+                </datalist>
+              </div>
 
-              <label className='form__editor-label'>Hair</label>
-              <div>
+              <div className="col-md-6">
+                <label className="form-label" htmlFor="bloodGroup">
+                  Blood Group
+                </label>
                 <select
-                  className='form__editor_input'
-                  name='hair_color'
-                  value={editingUser.hair.color}
-                  onChange={(e) => handleHairColorChange(e.target.value)}> 
-                    <option value="">{editingUser.hair.color}</option>
-                    <option value="Auburn">Auburn</option>
-                    <option value="Black">Black</option>
-                    <option value="Blond">Blond</option>
-                    <option value="Brown">Brown</option>
-                    <option value="Chestnut">Chestnut</option>
-                    <option value="Other">Other</option>
-
-                </select> 
+                  id="bloodGroup"
+                  name="blood_group"
+                  className="form-select"
+                  value={editingUser.bloodGroup}
+                  onChange={(e) => handlebloodGroupChange(e.target.value)}
+                >
+                  <option value="">{editingUser.bloodGroup}</option>
+                  <option value="A+">A RhD positive (A+)</option>
+                  <option value="A-">A RhD negative (A-)</option>
+                  <option value="B+">B RhD positive (B+)</option>
+                  <option value="B-">B RhD negative (B-)</option>
+                  <option value="0+">O RhD positive (O+)</option>
+                  <option value="0-">O RhD negative (O-)</option>
+                  <option value="AB+">AB RhD positive (AB+)</option>
+                  <option value="AB-">AB RhD negative (AB-)</option>
+                </select>
               </div>
-
-   
             </form>
 
-            <div className='form__buttons'>
-              <button 
-                className='btn btn-primary' 
+            <div className="form__buttons">
+              <button
+                className="btn btn-primary"
                 type="submit"
                 onClick={handleUserSubmit}
-                >
+                // disabled={valid}
+              >
                 Submit
               </button>
-
-              <button 
-                className='btn btn-outline-primary' 
-                onClick={() => setEditingUser(null)}>
+              <button
+                className="btn btn-outline-primary"
+                onClick={() => setEditingUser(null)}
+              >
                 Cansel
               </button>
-              </div>
+            </div>
           </div>
         </div>
+      )}
+
+      <table className="table">
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Gender</th>
+            <th>Age</th>
+            <th>BirthDate</th>
+            <th>Phone Number</th>
+            <th>Blood Group</th>
+            <th>Color of Hair</th>
+            <th>Type of Hair</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.firstName}</td>
+              <td>{user.lastName}</td>
+              <td>{user.email}</td>
+              <td>{user.password}</td>
+              <td>{user.gender}</td>
+              <td>{user.age}</td>
+              <td>{user.birthDate}</td>
+              <td>{user.phone}</td>
+              <td>{user.bloodGroup}</td>
+              <td>{user.hair.color}</td>
+              <td>{user.hair.type}</td>
+              <td>
+                <button
+                  id={user.id}
+                  className="btn btn-light"
+                  onClick={() => {
+                    setEditingUser(user);
+                  }}
+                >
+                  Edit
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// const deepClone = (originalObj) => {
+//   if (!originalObj || typeof originalObj !== "object")  {
+//     return originalObj;
+//   }
+
+//   const clonedObj = Array.isArray(originalObj) ? [] : {};
+
+//   for (const key in originalObj) {
+//     const value = originalObj[key];
+
+//     clonedObj[key] = deepClone(value);
+//   }
+
+//   return clonedObj;
+// };
+
+export default App;
